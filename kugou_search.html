@@ -36,7 +36,6 @@
                                 var res = eval("("+ajax.responseText+")");
                                 var lists = res.data.lists;
                                 parse(lists);//解析歌曲列表并显示在页面中
-                               
                             }
                         }
                     }
@@ -51,7 +50,7 @@
                     li = document.createElement("li");
                     a = document.createElement("a");
                     a.href = "javascript:;";
-                    a.innerHTML = arr[i]['SongName'];
+                    a.innerHTML = arr[i]['FileName'];
                     a.dataset.hash = arr[i]['FileHash'];
                     a.dataset.id = arr[i]['Audioid'];
                     a.className = "song";
