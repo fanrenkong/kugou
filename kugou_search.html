@@ -1,0 +1,85 @@
+<html>
+    <head>
+        <title>酷狗音乐搜索解析</title>
+        <style>
+        a{
+            text-decoration: none;
+        }
+        </style>
+    </head>
+    <body>
+        <span>名称：</span>
+        <input type="text" placeholder="名称" id="keyword">
+        <span>数量：</span>
+        <input type="text" placeholder="显示数量" id="count" value=5>
+        <button id="search">搜索</button>
+        <br>
+        <span>默认显示5条记录</span>
+        <br>
+        <ul id="result">
+
+        </ul>
+        <script>
+            document.getElementById("search").addEventListener("click",function(){
+                var keyword = document.getElementById("keyword").value;
+                var count = document.getElementById("count").value;
+                if(keyword!=""){
+                    if(count==0){
+                        count = 5;
+                    }
+                    var ajax = new XMLHttpRequest();
+                    if(ajax){
+                        ajax.open("get","https://songsearch.kugou.com/song_search_v2?keyword="+keyword+"&page=1&pagesize="+count+"&userid=-1&clientver=&platform=WebFilter&tag=em&filter=2&iscorrection=1&privilege_filter=0&_=1577347214525");
+                        ajax.send(null);
+                        ajax.onreadystatechange = function(){
+                            if(ajax.readyState == 4){
+                                var res = eval("("+ajax.responseText+")");
+                                var lists = res.data.lists;
+                                parse(lists);//解析歌曲列表并显示在页面中
+                               
+                            }
+                        }
+                    }
+                }else{
+                    alert("请输入完整信息")
+                }
+            });
+            function parse(arr){
+                document.getElementById("result").innerHTML = "";
+                var li,a;
+                for(var i=0;i<arr.length;i++){
+                    li = document.createElement("li");
+                    a = document.createElement("a");
+                    a.href = "javascript:;";
+                    a.innerHTML = arr[i]['SongName'];
+                    a.dataset.hash = arr[i]['FileHash'];
+                    a.dataset.id = arr[i]['Audioid'];
+                    a.className = "song";
+                    document.getElementById("result").appendChild(li).appendChild(a);
+                    bindEvent();//为每一个a标签绑定点击事件
+                }
+            };
+            function bindEvent(){
+                var song = document.getElementsByClassName("song");
+                for(var j=0;j<song.length;j++){
+                    song[j].addEventListener("click",function(){
+                        getUrl(this.dataset.id,this.dataset.hash);//获取歌曲的链接
+                    });
+                }
+            }
+            function getUrl(id,hash){
+                var ajax1 = new XMLHttpRequest();
+                if(ajax1){
+                    ajax1.open("get","https://wwwapi.kugou.com/yy/index.php?r=play/getdata&hash="+hash+"&album_id="+id);
+                    ajax1.send(null);
+                    ajax1.onreadystatechange = function(){
+                        if(ajax1.readyState == 4){
+                            var res = eval("("+ajax1.responseText+")");
+                            window.open(res['data']['play_url']);
+                        }
+                    }
+                }
+            }
+        </script> 
+    </body>
+</html>
